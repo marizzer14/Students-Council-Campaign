@@ -57,9 +57,9 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Email Confirmation via EmailJS
+// Email Confirmation sa EmailJS
 function sendEmailConfirmation(email, voterName, votes) {
-    // Create vote summary as HTML for better formatting
+    // 
     let voteSummaryHtml = '<ul style="list-style-type: none; padding-left: 0;">';
     votes.forEach(vote => {
         voteSummaryHtml += `<li style="margin-bottom: 8px; padding: 8px; background: #f8fafc; border-radius: 8px;">
@@ -68,20 +68,18 @@ function sendEmailConfirmation(email, voterName, votes) {
     });
     voteSummaryHtml += '</ul>';
     
-    // Create plain text summary as fallback
+    //  plain text para sa fallback
     let voteSummaryText = '';
     votes.forEach(vote => {
         voteSummaryText += `${vote.position}: ${vote.candidate}\n`;
     });
-    
-    // IMPORTANT: EmailJS expects the recipient email in a specific format
-    // The parameter name should match what's in your EmailJS template
+ 
     const templateParams = {
-        // For the recipient - this is the MOST IMPORTANT part
-        to_email: email,                    // Try this first
-        email: email,                        // Alternative parameter name
-        to: email,                           // Another common parameter name
-        recipient: email,                     // And another
+        // For the recipient
+        to_email: email,    
+        email: email,       
+        to: email,                           //
+        recipient: email,                     /
         
         // Personalization parameters
         to_name: voterName,
@@ -111,8 +109,8 @@ function sendEmailConfirmation(email, voterName, votes) {
     `;
     document.getElementById('emailModal').style.display = 'flex';
     
-  const serviceId = 'studentcoucilcampaign'; // Replace with your service ID
-    const templateId = 'template_p7kat39'; // Replace with your template ID
+  const serviceId = 'studentcoucilcampaign'; // HEREEE service ID
+    const templateId = 'template_p7kat39'; //HEREEE template ID
     
     // Send email via EmailJS
     emailjs.send(serviceId, templateId, templateParams)
