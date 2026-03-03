@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>studentcouncilcampaign.online | Secure Voting Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Role Selection Modal -->
+    <div class="role-modal" id="roleModal">
+        <div class="role-content">
+            <div class="role-header">
+                <h1>Student Council Campaign</h1>
+                <p>Welcome to the official student council election portal. Please select your role to continue.</p>
+            </div>
+
+            <div class="role-cards">
+                <!-- Admin Card -->
+                <div class="role-card">
+                    <div class="role-icon">👑</div>
+                    <h2>Admin</h2>
+                    <p>Manage positions, candidates, and view election results.</p>
+                    <button class="role-btn admin-btn" id="showAdminLogin">Continue as Admin</button>
+                    
+                    <div class="admin-code-section" id="adminCodeSection">
+                        <input type="password" id="adminCode" class="code-input" placeholder="Enter admin code">
+                        <button class="verify-btn" id="verifyAdminBtn">Verify & Login</button>
+                        <p class="code-hint">Default code: <strong>ADMIN123</strong></p>
+                    </div>
+                </div>
+
+                <!-- Voter Card -->
+                <div class="role-card voter">
+                    <div class="role-icon">🗳️</div>
+                    <h2>Voter</h2>
+                    <p>Cast your vote for student council positions.</p>
+                    <button class="role-btn voter-btn" id="continueAsVoter">Continue as Voter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voter Registration Modal -->
+    <div class="registration-modal" id="registrationModal">
+        <div class="registration-content">
+            <div class="registration-header">
+                <h2>Voter Registration</h2>
+                <p>Please verify your identity to proceed</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="voterEmail" placeholder="your@email.com" class="form-input">
+                <small class="form-hint">You'll receive email confirmation</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="voterName" placeholder="Enter your name" class="form-input">
+            </div>
+            
+            <button class="verify-btn" id="verifyVoterBtn">Start Voting</button>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <span class="brand-name">StudentCouncilCampaign</span>
+                <span class="brand-badge">.online</span>
+            </div>
+            <div class="nav-menu" id="navMenu"></div>
+            <div class="voter-info" id="voterInfo" style="display: none;">
+                <span class="voter-badge">✓ Verified Voter</span>
+                <span class="voter-email" id="displayEmail"></span>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent"></main>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="review-modal" id="reviewModal">
+        <div class="review-content">
+            <h3>Review Your Votes</h3>
+            <div id="reviewList"></div>
+            <div class="review-actions">
+                <button class="cancel-btn" id="closeReviewModal">Go Back</button>
+                <button class="confirm-btn" id="confirmVotesBtn">Confirm & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div class="email-modal" id="emailModal">
+        <div class="email-content">
+            <div class="email-icon">📧</div>
+            <h3>Email Confirmation Sent!</h3>
+            <p>Your votes have been recorded successfully.</p>
+            <div class="email-details" id="emailDetails"></div>
+            <button class="okay-btn" id="closeEmailModal">OK</button>
+        </div>
+    </div>
+
+   <div class="toast" id="toast"></div>
+
+    <!-- EmailJS SDK - LOAD THIS FIRST -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // REPLACE WITH YOUR ACTUAL PUBLIC KEY FROM EMAILJS DASHBOARD
+            emailjs.init("aNhr-9YOM79owK-nH"); 
+            console.log("EmailJS initialized with public key");
+        })();
+    </script>
+
+    <!-- THEN load main.js -->
+    <script src="main.js"></script>
+</body>
+</html>
