@@ -78,8 +78,8 @@ function sendEmailConfirmation(email, voterName, votes) {
         // For the recipient
         to_email: email,    
         email: email,       
-        to: email,                           //
-        recipient: email,                     /
+        to: email,                           
+        recipient: email,                     
         
         // Personalization parameters
         to_name: voterName,
