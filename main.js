@@ -109,8 +109,8 @@ function sendEmailConfirmation(email, voterName, votes) {
     `;
     document.getElementById('emailModal').style.display = 'flex';
     
-  const serviceId = 'studentcoucilcampaign'; // HEREEE service ID
-    const templateId = 'template_p7kat39'; //HEREEE template ID
+  const serviceId = 'service_vote.confirmed'; // HEREEE service ID
+    const templateId = 'template_vote.confirmed'; //HEREEE template ID
     
     // Send email via EmailJS
     emailjs.send(serviceId, templateId, templateParams)
