@@ -8,6 +8,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- TEMPORARY DEBUG BUTTON - REMOVE AFTER TESTING -->
+<div style="position: fixed; bottom: 10px; right: 10px; z-index: 999999; background: #2563eb; color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 14px;" onclick="testMobile()">
+    📱 TEST MOBILE
+</div>
+
+<script>
+function testMobile() {
+    // Force mobile styles
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
+    // Show which mode we're in
+    alert('Window width: ' + window.innerWidth + 'px\nIs this a phone? ' + (window.innerWidth <= 768 ? 'Yes' : 'No'));
+}
+</script>
     <!-- Role Selection Modal -->
     <div class="role-modal" id="roleModal">
         <div class="role-content">
@@ -27,7 +42,7 @@
                     <div class="admin-code-section" id="adminCodeSection">
                         <input type="password" id="adminCode" class="code-input" placeholder="Enter admin code">
                         <button class="verify-btn" id="verifyAdminBtn">Verify & Login</button>
-              
+                        <p class="code-hint">Default code: <strong>ADMIN123</strong></p>
                     </div>
                 </div>
 
@@ -109,17 +124,17 @@
 
    <div class="toast" id="toast"></div>
 
-    <!-- EmailJS SDK . -->
+    <!-- EmailJS SDK - LOAD THIS FIRST -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-           
-            emailjs.init("XH-RYKhvRFFw3kRGN"); 
+            // REPLACE WITH YOUR ACTUAL PUBLIC KEY FROM EMAILJS DASHBOARD
+            emailjs.init("aNhr-9YOM79owK-nH"); 
             console.log("EmailJS initialized with public key");
         })();
     </script>
 
-   
+    <!-- THEN load main.js -->
     <script src="main.js"></script>
 </body>
 </html>
