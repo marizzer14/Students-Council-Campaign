@@ -1213,373 +1213,212 @@ body {
         width: 100%;
     }
 
-
-
-/* CSS for (Phones) */
-@media (max-width: 480px) {
-    /* Role Modal */
+    /* ===== SIMPLE MOBILE FIX - JUST ADD THIS ===== */
+@media only screen and (max-width: 768px) {
+    /* Make everything scrollable */
+    body, html {
+        overflow-y: auto !important;
+        height: auto !important;
+        position: relative !important;
+    }
+    
+    /* Fix modals */
+    .role-modal, 
+    .registration-modal, 
+    .review-modal, 
+    .email-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 20px 15px !important;
+    }
+    
+    /* Make content smaller */
     .role-header h1 {
-        font-size: 2rem;
+        font-size: 2rem !important;
     }
     
     .role-header p {
-        font-size: 1rem;
-        padding: 0 1rem;
+        font-size: 1rem !important;
     }
     
     .role-card {
-        padding: 2rem 1rem;
-        min-width: 280px;
+        padding: 25px 15px !important;
+        margin: 10px 0 !important;
     }
     
     .role-icon {
-        width: 70px;
-        height: 70px;
-        font-size: 2rem;
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 2rem !important;
     }
     
-    .role-card h2 {
-        font-size: 1.5rem;
-    }
-    
-    /* Registration Modal */
-    .registration-content {
-        padding: 2rem 1.5rem;
-    }
-    
-    .registration-header h2 {
-        font-size: 1.8rem;
+    /* Stack cards vertically */
+    .role-cards {
+        flex-direction: column !important;
+        align-items: center !important;
     }
     
     /* Navigation */
     .top-nav {
-        padding: 0.8rem 1rem;
-    }
-    
-    .brand-name {
-        font-size: 1rem;
-    }
-    
-    .brand-badge {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.6rem;
+        flex-direction: column !important;
+        padding: 10px !important;
     }
     
     .nav-menu {
-        flex-wrap: wrap;
-        gap: 0.3rem;
-    }
-    
-    .nav-btn, .logout-btn {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    .logout-btn svg {
-        width: 16px;
-        height: 16px;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
     }
     
     .voter-info {
-        flex-wrap: wrap;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        border-left: none !important;
+        justify-content: center !important;
     }
     
-    .voter-email {
-        max-width: 150px;
-        font-size: 0.9rem;
-    }
-    
-    /* Main Content */
+    /* Main content */
     .main-content {
-        padding: 0 1rem;
-        margin: 1rem auto;
+        padding: 0 10px !important;
     }
     
-    /* Hero Section */
+    /* Hero section */
     .hero-section {
-        padding: 2rem 1rem;
-        border-radius: 1.5rem;
-    }
-    
-    .hero-badge {
-        padding: 0.4rem 1.2rem;
-        font-size: 0.75rem;
+        padding: 30px 15px !important;
     }
     
     .hero-title {
-        font-size: 2rem;
+        font-size: 2rem !important;
     }
     
-    .hero-description {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        padding: 0 0.5rem;
-    }
-    
-    .vote-btn {
-        padding: 0.8rem 2rem;
-        font-size: 1rem;
-    }
-    
-    /* Stats Cards */
+    /* Stats grid - 2 columns */
     .stats-preview {
-        gap: 1rem;
-        margin-top: 2rem;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
     }
     
     .stat-card {
-        padding: 1.5rem;
+        padding: 15px 10px !important;
     }
     
     .stat-number {
-        font-size: 2rem;
+        font-size: 1.8rem !important;
     }
     
-    .stat-label {
-        font-size: 0.9rem;
-    }
-    
-    /* Voting Section */
-    .section-header h2 {
-        font-size: 1.8rem;
-    }
-    
-    .instruction-card {
-        padding: 1rem;
-        gap: 1rem;
-    }
-    
-    .instruction-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.8rem;
-    }
-    
-    .instruction-text h4 {
-        font-size: 0.95rem;
-    }
-    
-    .instruction-text p {
-        font-size: 0.85rem;
-    }
-    
-    .position-voting-card {
-        padding: 1.5rem;
-    }
-    
-    .position-header h3 {
-        font-size: 1.4rem;
+    /* Voting section */
+    .candidates-voting-grid {
+        grid-template-columns: 1fr !important;
     }
     
     .candidate-option {
-        padding: 1rem;
+        display: flex !important;
+        align-items: center !important;
+        text-align: left !important;
+        gap: 15px !important;
+        padding: 10px !important;
     }
     
     .candidate-image {
-        width: 80px;
-        height: 80px;
+        width: 60px !important;
+        height: 60px !important;
+        margin: 0 !important;
     }
     
-    .candidate-option-name {
-        font-size: 1rem;
+    /* Voting actions */
+    .voting-actions {
+        flex-direction: column !important;
     }
     
-    .candidate-option-bio {
-        font-size: 0.8rem;
+    .review-btn, 
+    .submit-votes-btn {
+        width: 100% !important;
     }
     
-    /* Admin Dashboard */
-    .admin-dashboard {
-        padding: 1rem;
-    }
-    
+    /* Admin section */
     .admin-header {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-    
-    .admin-header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .admin-badge {
-        font-size: 0.8rem;
-        margin-left: 0.5rem;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
     }
     
     .reset-btn {
-        width: 100%;
+        width: 100% !important;
     }
     
     .admin-tabs {
-        gap: 0.5rem;
+        flex-wrap: wrap !important;
     }
     
     .admin-tab {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
+        flex: 1 1 auto !important;
+        padding: 8px 12px !important;
     }
     
+    /* Tables - make scrollable */
     .results-table {
-        font-size: 0.9rem;
+        min-width: 500px !important;
     }
     
-    .results-table th,
-    .results-table td {
-        padding: 0.75rem;
-    }
-    
-    /* Tables - Make horizontal scrollable */
     .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
     }
     
-    /* Position Items */
-    .position-item {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-    
-    .position-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-    
-    /* Candidate Items */
+    /* Position and candidate items */
+    .position-item,
     .candidate-item {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
     }
     
-    .candidate-info {
-        width: 100%;
-    }
-    
+    .position-actions,
     .candidate-actions {
-        width: 100%;
-        justify-content: flex-end;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
     }
     
-    /* Image Upload */
-    #browseImageBtn {
-        padding: 0.6rem 1rem !important;
-        font-size: 0.9rem;
-    }
-    
-    #selectedFileName {
-        max-width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    
-    /* Modals */
+    /* Modals content */
     .review-content,
     .email-content {
-        padding: 1.5rem;
-        width: 95%;
-    }
-    
-    .review-content h3 {
-        font-size: 1.4rem;
+        padding: 20px 15px !important;
+        margin: 20px auto !important;
     }
     
     .review-actions {
-        flex-direction: column;
-    }
-    
-    .cancel-btn,
-    .confirm-btn,
-    .okay-btn {
-        width: 100%;
+        flex-direction: column !important;
     }
     
     /* Toast */
     .toast {
-        bottom: 1rem;
-        right: 1rem;
-        left: 1rem;
-        max-width: none;
-        text-align: center;
+        left: 15px !important;
+        right: 15px !important;
+        bottom: 15px !important;
+        max-width: none !important;
+        text-align: center !important;
     }
 }
 
-/* Landscape Mode for Phones */
-@media (max-width: 900px) and (orientation: landscape) {
-    .role-modal,
-    .registration-modal {
-        align-items: flex-start;
-        overflow-y: auto;
-        padding: 2rem 0;
+/* Even smaller phones */
+@media only screen and (max-width: 380px) {
+    .candidate-option {
+        flex-direction: column !important;
+        text-align: center !important;
     }
     
-    .role-content {
-        margin: 2rem auto;
-    }
-    
-    .role-cards {
-        flex-direction: row;
-    }
-    
-    .role-card {
-        min-width: 250px;
-    }
-    
-    .admin-tabs {
-        flex-wrap: wrap;
-    }
-}
-
-/* Tablet Optimization */
-@media (min-width: 481px) and (max-width: 768px) {
-    .candidates-voting-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .candidate-image {
+        margin: 0 auto 10px !important;
     }
     
     .stats-preview {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .hero-title {
-        font-size: 3rem;
-    }
-}
-
-/* Touch-friendly improvements */
-@media (hover: none) and (pointer: coarse) {
-    /* Larger touch targets for mobile */
-    .nav-btn,
-    .role-btn,
-    .verify-btn,
-    .candidate-option,
-    .edit-btn,
-    .delete-btn,
-    .reset-btn,
-    .admin-tab,
-    .review-btn,
-    .submit-votes-btn,
-    .cancel-btn,
-    .confirm-btn,
-    .okay-btn {
-        min-height: 44px; /* Apple's recommended minimum */
-    }
-    
-    /* Remove hover effects on mobile */
-    .candidate-option:hover {
-        transform: none;
-    }
-    
-    .role-card:hover {
-        transform: none;
-    }
-    
-    /* Better spacing for touch */
-    .candidate-option {
-        padding: 1.2rem 1rem;
+        grid-template-columns: 1fr !important;
     }
 }
 }
