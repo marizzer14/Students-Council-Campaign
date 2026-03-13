@@ -1212,4 +1212,374 @@ body {
     .review-btn, .submit-votes-btn {
         width: 100%;
     }
+
+
+
+/* CSS for (Phones) */
+@media (max-width: 480px) {
+    /* Role Modal */
+    .role-header h1 {
+        font-size: 2rem;
+    }
+    
+    .role-header p {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .role-card {
+        padding: 2rem 1rem;
+        min-width: 280px;
+    }
+    
+    .role-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+    
+    .role-card h2 {
+        font-size: 1.5rem;
+    }
+    
+    /* Registration Modal */
+    .registration-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .registration-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    /* Navigation */
+    .top-nav {
+        padding: 0.8rem 1rem;
+    }
+    
+    .brand-name {
+        font-size: 1rem;
+    }
+    
+    .brand-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+    
+    .nav-menu {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    
+    .nav-btn, .logout-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .logout-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .voter-info {
+        flex-wrap: wrap;
+    }
+    
+    .voter-email {
+        max-width: 150px;
+        font-size: 0.9rem;
+    }
+    
+    /* Main Content */
+    .main-content {
+        padding: 0 1rem;
+        margin: 1rem auto;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        padding: 2rem 1rem;
+        border-radius: 1.5rem;
+    }
+    
+    .hero-badge {
+        padding: 0.4rem 1.2rem;
+        font-size: 0.75rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-description {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 0 0.5rem;
+    }
+    
+    .vote-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+    
+    /* Stats Cards */
+    .stats-preview {
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+    }
+    
+    /* Voting Section */
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .instruction-card {
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .instruction-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem;
+    }
+    
+    .instruction-text h4 {
+        font-size: 0.95rem;
+    }
+    
+    .instruction-text p {
+        font-size: 0.85rem;
+    }
+    
+    .position-voting-card {
+        padding: 1.5rem;
+    }
+    
+    .position-header h3 {
+        font-size: 1.4rem;
+    }
+    
+    .candidate-option {
+        padding: 1rem;
+    }
+    
+    .candidate-image {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .candidate-option-name {
+        font-size: 1rem;
+    }
+    
+    .candidate-option-bio {
+        font-size: 0.8rem;
+    }
+    
+    /* Admin Dashboard */
+    .admin-dashboard {
+        padding: 1rem;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .admin-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .admin-badge {
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+    }
+    
+    .reset-btn {
+        width: 100%;
+    }
+    
+    .admin-tabs {
+        gap: 0.5rem;
+    }
+    
+    .admin-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .results-table {
+        font-size: 0.9rem;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 0.75rem;
+    }
+    
+    /* Tables - Make horizontal scrollable */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Position Items */
+    .position-item {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .position-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    /* Candidate Items */
+    .candidate-item {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .candidate-info {
+        width: 100%;
+    }
+    
+    .candidate-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    /* Image Upload */
+    #browseImageBtn {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.9rem;
+    }
+    
+    #selectedFileName {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Modals */
+    .review-content,
+    .email-content {
+        padding: 1.5rem;
+        width: 95%;
+    }
+    
+    .review-content h3 {
+        font-size: 1.4rem;
+    }
+    
+    .review-actions {
+        flex-direction: column;
+    }
+    
+    .cancel-btn,
+    .confirm-btn,
+    .okay-btn {
+        width: 100%;
+    }
+    
+    /* Toast */
+    .toast {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+        text-align: center;
+    }
+}
+
+/* Landscape Mode for Phones */
+@media (max-width: 900px) and (orientation: landscape) {
+    .role-modal,
+    .registration-modal {
+        align-items: flex-start;
+        overflow-y: auto;
+        padding: 2rem 0;
+    }
+    
+    .role-content {
+        margin: 2rem auto;
+    }
+    
+    .role-cards {
+        flex-direction: row;
+    }
+    
+    .role-card {
+        min-width: 250px;
+    }
+    
+    .admin-tabs {
+        flex-wrap: wrap;
+    }
+}
+
+/* Tablet Optimization */
+@media (min-width: 481px) and (max-width: 768px) {
+    .candidates-voting-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-preview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets for mobile */
+    .nav-btn,
+    .role-btn,
+    .verify-btn,
+    .candidate-option,
+    .edit-btn,
+    .delete-btn,
+    .reset-btn,
+    .admin-tab,
+    .review-btn,
+    .submit-votes-btn,
+    .cancel-btn,
+    .confirm-btn,
+    .okay-btn {
+        min-height: 44px; /* Apple's recommended minimum */
+    }
+    
+    /* Remove hover effects on mobile */
+    .candidate-option:hover {
+        transform: none;
+    }
+    
+    .role-card:hover {
+        transform: none;
+    }
+    
+    /* Better spacing for touch */
+    .candidate-option {
+        padding: 1.2rem 1rem;
+    }
+}
 }
