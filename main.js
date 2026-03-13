@@ -1,697 +1,823 @@
-// App State
+z// Global state
 let appState = {
     isAdmin: false,
     adminCode: 'ADMIN123',
+    positions: [],
+    candidates: [],
+    votes: {},
+    voters: [],
+    currentVoter: null
+};
+
+// Initialize default data
+const defaultData = {
     positions: [
         { id: 'pos1', title: 'President', description: 'Student body president', order: 1 },
         { id: 'pos2', title: 'Vice President', description: 'Assistant to president', order: 2 },
         { id: 'pos3', title: 'Secretary', description: 'Records and communication', order: 3 }
     ],
     candidates: [
-        { id: 'c1', positionId: 'pos1', name: 'Greg Legarto', bio: 'Candidate 1', img: 'assets/imgs/Pres1.png' },
-        { id: 'c2', positionId: 'pos1', name: 'Mariel Ann Magtibay', bio: 'Candidate 2', img: 'assets/imgs/Press2.png' },
-        { id: 'c3', positionId: 'pos2', name: 'John Lenard Ebalan', bio: 'Candidate 1', img: 'assets/imgs/VPress1.png' },
-        { id: 'c4', positionId: 'pos2', name: 'Maricar Berunio', bio: 'Candidate 2', img: 'assets/imgs/VPress2.png' },
-        { id: 'c5', positionId: 'pos3', name: 'Johnrey Serito', bio: 'Candidate 1', img: 'assets/imgs/Secretary1.png' },
-        { id: 'c6', positionId: 'pos3', name: 'Jemson Ganadores ', bio: 'Candidate 2', img: 'assets/imgs/Secretary2.png' }
-    ],
-    votes: {},
-    voters: [],
-    currentVoter: null
+        { id: 'c1', positionId: 'pos1', name: 'Greg Legarto', bio: 'Visionary leader', img: 'assets/imgs/Press1' },
+        { id: 'c2', positionId: 'pos1', name: 'Mariel Magtibay', bio: 'Student advocate', img: 'assets/imgs/Press2' },
+        { id: 'c3', positionId: 'pos2', name: 'John Lenard Ebalan', bio: 'Former class rep', img: 'assets/imgs/VPress1' },
+        { id: 'c4', positionId: 'pos2', name: 'Priya Sharma', bio: 'Community organizer', img: 'assets/imgs/VPress2' },
+        { id: 'c5', positionId: 'pos3', name: 'sec1', bio: 'Yearbook editor', img: 'assets/imgs/Secretary1' },
+        { id: 'c6', positionId: 'pos3', name: 'Elena Petrov', bio: 'Debate club secretary', img: 'assets/imgs/Secretary2' }
+    ]
 };
 
-// Load data
+// Load or initialize data
 function loadData() {
     const saved = localStorage.getItem('campaignData');
     if (saved) {
-        try {
-            const parsed = JSON.parse(saved);
-            appState.positions = parsed.positions || appState.positions;
-            appState.candidates = parsed.candidates || appState.candidates;
-            appState.votes = parsed.votes || {};
-            appState.voters = parsed.voters || [];
-        } catch (e) {
-            console.error('Error loading data', e);
-        }
+        appState = JSON.parse(saved);
+    } else {
+        appState.positions = defaultData.positions;
+        appState.candidates = defaultData.candidates;
+        appState.votes = {};
+        appState.voters = [];
+        appState.currentVoter = null;
+        saveData();
     }
 }
 
-// Save data
+// Save data to localStorage
 function saveData() {
-    localStorage.setItem('campaignData', JSON.stringify({
-        positions: appState.positions,
-        candidates: appState.candidates,
-        votes: appState.votes,
-        voters: appState.voters
-    }));
+    localStorage.setItem('campaignData', JSON.stringify(appState));
 }
 
-// Show toast
+// Show toast notification
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
+    if (!toast) return;
+    
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.style.display = 'block';
+    
     setTimeout(() => {
         toast.style.display = 'none';
     }, 3000);
 }
 
-// Email Confirmation sa EmailJS
-function sendEmailConfirmation(email, voterName, votes) {
-    // 
-    let voteSummaryHtml = '<ul style="list-style-type: none; padding-left: 0;">';
-    votes.forEach(vote => {
-        voteSummaryHtml += `<li style="margin-bottom: 8px; padding: 8px; background: #f8fafc; border-radius: 8px;">
-            <strong>${vote.position}:</strong> ${vote.candidate}
-        </li>`;
-    });
-    voteSummaryHtml += '</ul>';
+// Simulate sending SMS
+function sendSMS(mobile, message) {
+    console.log(`SMS sent to ${mobile}: ${message}`);
     
-    //  plain text para sa fallback
-    let voteSummaryText = '';
-    votes.forEach(vote => {
-        voteSummaryText += `${vote.position}: ${vote.candidate}\n`;
-    });
- 
-    const templateParams = {
-        // For the recipient
-        to_email: email,    
-        email: email,       
-        to: email,                           
-        recipient: email,                     
-        
-        // Personalization parameters
-        to_name: voterName,
-        voter_name: voterName,
-        name: voterName,
-        
-        // Email content
-        voter_email: email,
-        vote_summary_html: voteSummaryHtml,
-        vote_summary: voteSummaryText,
-        vote_count: votes.length,
-        total_positions: appState.positions.length,
-        election_date: new Date().toLocaleDateString(),
-        election_time: new Date().toLocaleTimeString(),
-        
-        // Subject and message
-        subject: `Your Student Council Election Votes Confirmation - ${new Date().toLocaleDateString()}`,
-        message: `Thank you for voting in the Student Council Election! Your voice matters.`
-    };
+    // Show SMS modal
+    const smsModal = document.getElementById('smsModal');
+    if (!smsModal) return;
     
-    console.log('Sending email to:', email); // Debug log
+    const smsMessage = document.getElementById('smsMessage');
+    const smsDetails = document.getElementById('smsDetails');
     
-    // Show sending status
-    document.getElementById('emailDetails').innerHTML = `
-        <strong>Sending to:</strong> ${email}<br>
-        <strong>Status:</strong> <span style="color: #f59e0b;">⏳ Sending confirmation...</span>
-    `;
-    document.getElementById('emailModal').style.display = 'flex';
+    if (smsMessage) smsMessage.textContent = 'Your votes have been recorded successfully!';
+    if (smsDetails) {
+        smsDetails.innerHTML = `
+            <strong>To:</strong> ${mobile}<br>
+            <strong>Message:</strong> ${message}<br>
+            <strong>Time:</strong> ${new Date().toLocaleString()}
+        `;
+    }
     
-  const serviceId = 'service_vote.confirmed'; // HEREEE service ID
-    const templateId = 'template_vote.confirmed'; //HEREEE template ID
+    smsModal.style.display = 'flex';
     
-    // Send email via EmailJS
-    emailjs.send(serviceId, templateId, templateParams)
-        .then(function(response) {
-            console.log('Email sent successfully!', response);
-            
-            // Show success
-            document.getElementById('emailDetails').innerHTML = `
-                <strong>To:</strong> ${email}<br>
-                <strong>Your votes:</strong><br>
-                ${votes.map(v => `• ${v.position}: ${v.candidate}`).join('<br>')}<br><br>
-                <div style="background: #10b981; color: white; padding: 1rem; border-radius: 1rem; text-align: center;">
-                    <strong style="font-size: 1.2rem;">✓ Email Sent Successfully!</strong><br>
-                    <small>Check your inbox (and spam folder)</small>
-                </div>
-            `;
-            showToast('✅ Confirmation email sent!', 'success');
-        })
-        .catch(function(error) {
-            console.error('Email failed - Full error:', error);
-            
-            // Show detailed error
-            let errorMessage = 'Email service unavailable';
-            if (error.text) {
-                errorMessage = error.text;
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-            
-            document.getElementById('emailDetails').innerHTML = `
-                <strong>To:</strong> ${email}<br>
-                <strong>Your votes:</strong><br>
-                ${votes.map(v => `• ${v.position}: ${v.candidate}`).join('<br>')}<br><br>
-                <div style="background: #f59e0b; color: white; padding: 1rem; border-radius: 1rem; text-align: center;">
-                    <strong>⚠ Email Service Unavailable</strong><br>
-                    <small>Error: ${errorMessage}</small><br>
-                    <small>But your vote is recorded!</small>
-                    <br><br>
-                    <small style="font-size: 0.8rem;">Debug: Recipient was "${email}"</small>
-                </div>
-            `;
-            showToast('✅ Vote recorded! (Email confirmation failed)', 'success');
-        });
-    
-    // Auto-hide after 10 seconds
+    // Auto-hide after 5 seconds
     setTimeout(() => {
-        document.getElementById('emailModal').style.display = 'none';
-    }, 10000);
+        if (smsModal) smsModal.style.display = 'none';
+    }, 5000);
 }
 
-// Convert image file to base64 for storage
-function readImageFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            resolve(e.target.result);
-        };
-        reader.onerror = (e) => {
-            reject(e);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-// Setup image upload functionality
-function setupImageUpload() {
-    const browseBtn = document.getElementById('browseImageBtn');
-    const fileInput = document.getElementById('candidateImageUpload');
-    const fileNameSpan = document.getElementById('selectedFileName');
-    const previewImg = document.getElementById('previewImg');
-    const hiddenInput = document.getElementById('candidateImage');
+// Show section
+function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    const section = document.getElementById(sectionId);
+    if (section) section.classList.add('active');
     
-    if (browseBtn && fileInput) {
-        // Remove existing listeners to avoid duplicates
-        browseBtn.replaceWith(browseBtn.cloneNode(true));
-        fileInput.replaceWith(fileInput.cloneNode(true));
-        
-        // Get fresh references
-        const newBrowseBtn = document.getElementById('browseImageBtn');
-        const newFileInput = document.getElementById('candidateImageUpload');
-        const newFileNameSpan = document.getElementById('selectedFileName');
-        const newPreviewImg = document.getElementById('previewImg');
-        const newHiddenInput = document.getElementById('candidateImage');
-        
-        newBrowseBtn.addEventListener('click', function() {
-            newFileInput.click();
-        });
-        
-        newFileInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                // Show file name
-                if (newFileNameSpan) {
-                    newFileNameSpan.textContent = file.name;
-                }
-                
-                // Check file size (limit to 2MB)
-                if (file.size > 2 * 1024 * 1024) {
-                    showToast('Image too large. Max 2MB', 'error');
-                    return;
-                }
-                
-                try {
-                    // Convert to base64
-                    const base64Image = await readImageFile(file);
-                    
-                    // Update preview
-                    if (newPreviewImg) {
-                        newPreviewImg.src = base64Image;
-                    }
-                    
-                    // Store in hidden input
-                    if (newHiddenInput) {
-                        newHiddenInput.value = base64Image;
-                    }
-                    
-                    showToast('Image loaded successfully', 'success');
-                } catch (error) {
-                    console.error('Error reading image:', error);
-                    showToast('Error loading image', 'error');
-                }
-            }
-        });
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const navHome = document.getElementById('navHome');
+    const navVote = document.getElementById('navVote');
+    const navResults = document.getElementById('navResults');
+    const navAdmin = document.getElementById('navAdmin');
+    
+    if (sectionId === 'homeSection' && navHome) navHome.classList.add('active');
+    else if (sectionId === 'voteSection' && navVote) navVote.classList.add('active');
+    else if (sectionId === 'resultsSection' && navResults) navResults.classList.add('active');
+    else if (sectionId === 'adminSection' && navAdmin) navAdmin.classList.add('active');
+    
+    // Load section data
+    if (sectionId === 'voteSection' && appState.currentVoter) {
+        loadVotingSection();
+    } else if (sectionId === 'resultsSection') {
+        loadResultsSection();
+    } else if (sectionId === 'adminSection' && appState.isAdmin) {
+        loadAdminPanel();
+    } else if (sectionId === 'homeSection') {
+        updateHomeStats();
     }
 }
 
-// Load home section
-function loadHomeSection() {
-    return `
-        <section class="content-section active" id="homeSection">
-            <div class="hero-section">
-                <div class="hero-content">
-                    <span class="hero-badge">STUDENT COUNCIL 2026</span>
-                    <h1 class="hero-title">Survey and Poll Campaign</h1>
-                    <p class="hero-description">
-                        We appreciate your decision to spend a few minutes of your time to complete the poll for the campaign-leads. Your responses will help us to improve our services in the future.
-                    </p>
-                    <button class="vote-btn" id="homeVoteBtn">
-                        <span>VOTE NOW</span>
-                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <path d="M4.16666 10H15.8333M15.8333 10L11.6667 5.83337M15.8333 10L11.6667 14.1667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="stats-preview">
-                <div class="stat-card">
-                    <span class="stat-number">${appState.positions.length}</span>
-                    <span class="stat-label">Positions</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">${appState.candidates.length}</span>
-                    <span class="stat-label">Candidates</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">${Object.keys(appState.votes).length}</span>
-                    <span class="stat-label">Votes Cast</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">${appState.voters.length}</span>
-                    <span class="stat-label">Voters</span>
-                </div>
-            </div>
-        </section>
-    `;
+// Update home stats
+function updateHomeStats() {
+    const positionsCount = document.getElementById('homePositionsCount');
+    const candidatesCount = document.getElementById('homeCandidatesCount');
+    const votesCount = document.getElementById('homeVotesCount');
+    const votersCount = document.getElementById('homeVotersCount');
+    
+    if (positionsCount) positionsCount.textContent = appState.positions.length;
+    if (candidatesCount) candidatesCount.textContent = appState.candidates.length;
+    if (votesCount) votesCount.textContent = Object.keys(appState.votes).length;
+    if (votersCount) votersCount.textContent = appState.voters.length;
 }
 
-// Load voting section
+// Load voting section with all positions
 function loadVotingSection() {
-    let positionsHtml = '';
+    const container = document.getElementById('positionsVotingContainer');
+    const verifiedMobile = document.getElementById('verifiedMobile');
+    const voterGreeting = document.getElementById('voterGreeting');
     
-    if (appState.positions.length === 0) {
-        positionsHtml = '<p class="no-positions">No positions available yet.</p>';
-    } else {
-        appState.positions.sort((a, b) => a.order - b.order).forEach(position => {
-            const candidates = appState.candidates.filter(c => c.positionId === position.id);
-            if (candidates.length === 0) return;
+    if (!container) return;
+    
+    if (verifiedMobile && appState.currentVoter) {
+        verifiedMobile.textContent = appState.currentVoter.mobile;
+    }
+    
+    if (voterGreeting && appState.currentVoter) {
+        const name = appState.currentVoter.name || 'Voter';
+        voterGreeting.textContent = `Welcome, ${name}! Please select your candidates for each position.`;
+    }
+    
+    // Clear container
+    container.innerHTML = '';
+    
+    // Sort positions by order
+    const sortedPositions = [...appState.positions].sort((a, b) => (a.order || 0) - (b.order || 0));
+    
+    // Create voting cards for each position
+    sortedPositions.forEach(position => {
+        const positionCandidates = appState.candidates.filter(c => c.positionId === position.id);
+        
+        if (positionCandidates.length === 0) return;
+        
+        const card = document.createElement('div');
+        card.className = 'position-voting-card';
+        card.setAttribute('data-position-id', position.id);
+        
+        // Create header
+        const header = document.createElement('div');
+        header.className = 'position-header';
+        header.innerHTML = `
+            <h3>${position.title}</h3>
+            <p>${position.description || 'Select one candidate'}</p>
+        `;
+        
+        // Create candidates grid
+        const candidatesGrid = document.createElement('div');
+        candidatesGrid.className = 'candidates-voting-grid';
+        
+        // Add candidates
+        positionCandidates.forEach(candidate => {
+            const candidateOption = document.createElement('div');
+            candidateOption.className = 'candidate-option';
+            candidateOption.setAttribute('data-candidate-id', candidate.id);
+            candidateOption.setAttribute('data-position-id', position.id);
             
-            let candidatesHtml = '';
-            candidates.forEach(candidate => {
-                const isSelected = appState.currentVoter && 
-                    appState.votes[appState.currentVoter.id] && 
-                    appState.votes[appState.currentVoter.id][position.id] === candidate.id;
+            candidateOption.innerHTML = `
+                <img src="${candidate.img}" alt="${candidate.name}" class="candidate-option-image" onerror="this.src='https://via.placeholder.com/100'">
+                <div class="candidate-option-name">${candidate.name}</div>
+                <div class="candidate-option-bio">${candidate.bio || ''}</div>
+            `;
+            
+            // Check if already voted for this position
+            const voterId = appState.currentVoter ? appState.currentVoter.id : null;
+            if (voterId && appState.votes[voterId] && appState.votes[voterId][position.id]) {
+                if (appState.votes[voterId][position.id] === candidate.id) {
+                    candidateOption.classList.add('selected');
+                }
+            }
+            
+            // Add click handler
+            candidateOption.addEventListener('click', function() {
+                // Remove selected class from all candidates in this position
+                document.querySelectorAll(`.candidate-option[data-position-id="${position.id}"]`).forEach(opt => {
+                    opt.classList.remove('selected');
+                });
                 
-                candidatesHtml += `
-                    <div class="candidate-option ${isSelected ? 'selected' : ''}" 
-                         data-position="${position.id}" 
-                         data-candidate="${candidate.id}">
-                        <img src="${candidate.img || 'https://via.placeholder.com/100'}" alt="${candidate.name}" class="candidate-image" onerror="this.src='https://via.placeholder.com/100'">
-                        <div class="candidate-option-name">${candidate.name}</div>
-                        <div class="candidate-option-bio">${candidate.bio || ''}</div>
-                    </div>
-                `;
-            });
-            
-            positionsHtml += `
-                <div class="position-voting-card" data-position-id="${position.id}">
-                    <div class="position-header">
-                        <h3>${position.title}</h3>
-                        <p>${position.description || 'Select one candidate'}</p>
-                    </div>
-                    <div class="candidates-voting-grid">
-                        ${candidatesHtml}
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    return `
-        <section class="content-section active" id="voteSection">
-            <div class="section-header">
-                <h2>Cast Your Votes</h2>
-                <p class="voter-greeting">Welcome, ${appState.currentVoter?.name || 'Voter'}!</p>
-            </div>
-
-            <div class="voting-instructions">
-                <div class="instruction-card">
-                    <div class="instruction-icon">📧</div>
-                    <div class="instruction-text">
-                        <h4>Your email: <span id="verifiedEmail">${appState.currentVoter?.email || ''}</span></h4>
-                        <p>You'll receive email confirmation after submitting your votes</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="positions-voting-container">
-                ${positionsHtml}
-            </div>
-
-            <div class="voting-actions">
-                <button class="review-btn" id="reviewVotesBtn">Review Votes</button>
-                <button class="submit-votes-btn" id="submitVotesBtn">
-                    <span>Submit All Votes</span>
-                </button>
-            </div>
-        </section>
-    `;
-}
-
-// Load admin dashboard
-function loadAdminDashboard() {
-    let resultsHtml = '';
-    
-    appState.positions.forEach(position => {
-        const candidates = appState.candidates.filter(c => c.positionId === position.id);
-        const votesForPos = {};
-        candidates.forEach(c => votesForPos[c.id] = 0);
-        
-        Object.values(appState.votes).forEach(voterVotes => {
-            const candidateId = voterVotes[position.id];
-            if (candidateId && votesForPos.hasOwnProperty(candidateId)) {
-                votesForPos[candidateId]++;
-            }
-        });
-        
-        candidates.forEach(candidate => {
-            const votes = votesForPos[candidate.id] || 0;
-            resultsHtml += `
-                <tr>
-                    <td><strong>${position.title}</strong></td>
-                    <td>${candidate.name}</td>
-                    <td class="vote-count">${votes}</td>
-                </tr>
-            `;
-        });
-    });
-
-    let positionsList = '';
-    appState.positions.forEach(position => {
-        positionsList += `
-            <div class="position-item">
-                <div class="position-info">
-                    <h4>${position.title}</h4>
-                    <p>${position.description || ''}</p>
-                </div>
-                <div class="position-actions">
-                    <button class="edit-btn" onclick="window.editPosition('${position.id}')">Edit</button>
-                    <button class="delete-btn" onclick="window.deletePosition('${position.id}')">Delete</button>
-                </div>
-            </div>
-        `;
-    });
-
-    let candidatesList = '';
-    appState.candidates.forEach(candidate => {
-        const position = appState.positions.find(p => p.id === candidate.positionId);
-        candidatesList += `
-            <div class="candidate-item">
-                <div class="candidate-info">
-                    <img src="${candidate.img || 'https://via.placeholder.com/50'}" class="candidate-thumb" onerror="this.src='https://via.placeholder.com/50'">
-                    <div class="candidate-details">
-                        <h4>${candidate.name}</h4>
-                        <p>${position?.title || 'Unknown'} - ${candidate.bio || ''}</p>
-                    </div>
-                </div>
-                <div class="candidate-actions">
-                    <button class="edit-btn" onclick="window.editCandidate('${candidate.id}')">Edit</button>
-                    <button class="delete-btn" onclick="window.deleteCandidate('${candidate.id}')">Delete</button>
-                </div>
-            </div>
-        `;
-    });
-
-    return `
-        <section class="content-section active" id="adminSection">
-            <div class="admin-dashboard">
-                <div class="admin-header">
-                    <h1>Admin Dashboard <span class="admin-badge">Admin</span></h1>
-                    <button class="reset-btn" onclick="window.resetVotes()">Reset All Votes</button>
-                </div>
-
-                <div class="admin-tabs">
-                    <button class="admin-tab active" data-tab="results">Results</button>
-                    <button class="admin-tab" data-tab="positions">Positions</button>
-                    <button class="admin-tab" data-tab="candidates">Candidates</button>
-                </div>
-
-                <div class="admin-tab-content active" id="resultsTab">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Position</th>
-                                <th>Candidate</th>
-                                <th>Votes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${resultsHtml}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="admin-tab-content" id="positionsTab">
-                    <div class="admin-card">
-                        <h3>Add New Position</h3>
-                        <input type="text" id="newPositionTitle" placeholder="Position title" class="form-input" style="margin-bottom:1rem;">
-                        <textarea id="newPositionDesc" placeholder="Description" class="form-input" style="margin-bottom:1rem;"></textarea>
-                        <button class="verify-btn" id="addPositionBtn">Add Position</button>
-                    </div>
-
-                    <div class="admin-card">
-                        <h3>Existing Positions</h3>
-                        ${positionsList}
-                    </div>
-                </div>
-
-                <div class="admin-tab-content" id="candidatesTab">
-                    <div class="admin-card">
-                        <h3>Add New Candidate</h3>
-                        <select id="candidatePositionSelect" class="form-input" style="margin-bottom:1rem;">
-                            <option value="">Select a position</option>
-                            ${appState.positions.map(p => `<option value="${p.id}">${p.title}</option>`).join('')}
-                        </select>
-                        <input type="text" id="candidateName" placeholder="Candidate name" class="form-input" style="margin-bottom:1rem;">
-                        <textarea id="candidateBio" placeholder="Bio" class="form-input" style="margin-bottom:1rem;"></textarea>
-                        
-                        <!-- Image Upload Section -->
-                        <div style="margin-bottom:1rem;">
-                            <label style="display:block; margin-bottom:0.5rem; font-weight:600;">Candidate Photo</label>
-                            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:0.5rem;">
-                                <input type="file" id="candidateImageUpload" accept="image/*" style="display:none;">
-                                <button type="button" id="browseImageBtn" class="edit-btn" style="padding:0.8rem 1.5rem; display:flex; align-items:center; gap:0.5rem;">
-                                    <span>📁</span> Browse Image
-                                </button>
-                                <span id="selectedFileName" style="color:#64748b;">No file selected</span>
-                            </div>
-                            <input type="hidden" id="candidateImage" value="">
-                        </div>
-                        
-                        <!-- Image Preview -->
-                        <div class="image-preview" id="imagePreview" style="margin-bottom:1rem;">
-                            <img src="https://via.placeholder.com/100" alt="Preview" id="previewImg" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid white; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);">
-                            <p style="color:#64748b; margin-top:0.5rem;">Image preview will appear here</p>
-                        </div>
-                        
-                        <button class="verify-btn" id="addCandidateBtn">Add Candidate</button>
-                    </div>
-
-                    <div class="admin-card">
-                        <h3>All Candidates</h3>
-                        ${candidatesList}
-                    </div>
-                </div>
-            </div>
-        </section>
-    `;
-}
-
-// Reset all votes
-window.resetVotes = function() {
-    if (confirm('Are you sure you want to reset ALL votes? This cannot be undone.')) {
-        appState.votes = {};
-        saveData();
-        document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-        attachAdminListeners();
-        showToast('All votes have been reset', 'info');
-    }
-};
-
-// Edit position
-window.editPosition = function(id) {
-    const position = appState.positions.find(p => p.id === id);
-    if (!position) return;
-    
-    const newTitle = prompt('Edit position title:', position.title);
-    if (newTitle && newTitle.trim()) {
-        position.title = newTitle.trim();
-        
-        const newDesc = prompt('Edit description:', position.description || '');
-        if (newDesc !== null) {
-            position.description = newDesc;
-        }
-        
-        saveData();
-        document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-        attachAdminListeners();
-        showToast('Position updated');
-    }
-};
-
-// Delete position
-window.deletePosition = function(id) {
-    if (confirm('Delete this position? All associated candidates will also be deleted.')) {
-        appState.positions = appState.positions.filter(p => p.id !== id);
-        appState.candidates = appState.candidates.filter(c => c.positionId !== id);
-        saveData();
-        document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-        attachAdminListeners();
-        showToast('Position deleted');
-    }
-};
-
-// Edit candidate
-window.editCandidate = function(id) {
-    const candidate = appState.candidates.find(c => c.id === id);
-    if (!candidate) return;
-    
-    const newName = prompt('Edit candidate name:', candidate.name);
-    if (newName && newName.trim()) {
-        candidate.name = newName.trim();
-        
-        const newBio = prompt('Edit bio:', candidate.bio || '');
-        if (newBio !== null) {
-            candidate.bio = newBio;
-        }
-        
-        const newImg = prompt('Edit image path:', candidate.img || '');
-        if (newImg !== null) {
-            candidate.img = newImg;
-        }
-        
-        saveData();
-        document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-        attachAdminListeners();
-        showToast('Candidate updated');
-    }
-};
-
-// Delete candidate
-window.deleteCandidate = function(id) {
-    if (confirm('Delete this candidate?')) {
-        appState.candidates = appState.candidates.filter(c => c.id !== id);
-        saveData();
-        document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-        attachAdminListeners();
-        showToast('Candidate deleted');
-    }
-};
-
-// Update navigation
-function updateNavigation() {
-    const navMenu = document.getElementById('navMenu');
-    
-    if (appState.isAdmin) {
-        navMenu.innerHTML = `
-            <button class="nav-btn active" data-section="admin">Dashboard</button>
-            <button class="logout-btn" id="logoutBtn">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M7.5 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V4.16667C2.5 3.72464 2.67559 3.30072 2.98816 2.98816C3.30072 2.67559 3.72464 2.5 4.16667 2.5H7.5M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-                Logout
-            </button>
-        `;
-    } else {
-        navMenu.innerHTML = `
-            <button class="nav-btn active" data-section="home">Home</button>
-            <button class="nav-btn" data-section="vote">Vote</button>
-            <button class="logout-btn" id="logoutBtn">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M7.5 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V4.16667C2.5 3.72464 2.67559 3.30072 2.98816 2.98816C3.30072 2.67559 3.72464 2.5 4.16667 2.5H7.5M13.3333 14.1667L17.5 10M17.5 10L13.3333 5.83333M17.5 10H7.5" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-                Logout
-            </button>
-        `;
-    }
-    
-    attachNavigationListeners();
-}
-
-// Attach navigation listeners
-function attachNavigationListeners() {
-    document.querySelectorAll('[data-section]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const section = this.dataset.section;
-            document.querySelectorAll('[data-section]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            if (section === 'home') {
-                document.getElementById('mainContent').innerHTML = loadHomeSection();
-                attachHomeButtonListener();
-            } else if (section === 'vote') {
-                document.getElementById('mainContent').innerHTML = loadVotingSection();
-                attachVotingListeners();
-            } else if (section === 'admin') {
-                document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-                attachAdminListeners();
-            }
-        });
-    });
-}
-
-// Attach home button listener
-function attachHomeButtonListener() {
-    const homeVoteBtn = document.getElementById('homeVoteBtn');
-    if (homeVoteBtn) {
-        homeVoteBtn.addEventListener('click', function() {
-            if (!appState.currentVoter) {
-                document.getElementById('appContainer').style.display = 'none';
-                document.getElementById('registrationModal').style.display = 'flex';
-            } else {
-                document.getElementById('mainContent').innerHTML = loadVotingSection();
-                document.querySelector('[data-section="vote"]').classList.add('active');
-                document.querySelector('[data-section="home"]').classList.remove('active');
-                attachVotingListeners();
-            }
-        });
-    }
-}
-
-// Attach voting listeners
-function attachVotingListeners() {
-    // Candidate selection
-    document.querySelectorAll('.candidate-option').forEach(option => {
-        option.addEventListener('click', function() {
-            const positionId = this.dataset.position;
-            const candidateId = this.dataset.candidate;
-            
-            this.parentElement.querySelectorAll('.candidate-option').forEach(o => {
-                o.classList.remove('selected');
-            });
-            
-            this.classList.add('selected');
-            
-            if (appState.currentVoter) {
+                // Add selected class to this candidate
+                this.classList.add('selected');
+                
+                // Store selection temporarily
+                if (!appState.currentVoter) return;
+                
                 if (!appState.votes[appState.currentVoter.id]) {
                     appState.votes[appState.currentVoter.id] = {};
                 }
-                appState.votes[appState.currentVoter.id][positionId] = candidateId;
-                saveData();
-                showToast(`Selected ${this.querySelector('.candidate-option-name').textContent}`, 'success');
+                
+                appState.votes[appState.currentVoter.id][position.id] = candidate.id;
+            });
+            
+            candidatesGrid.appendChild(candidateOption);
+        });
+        
+        card.appendChild(header);
+        card.appendChild(candidatesGrid);
+        container.appendChild(card);
+    });
+}
+
+// Load results section
+function loadResultsSection() {
+    const container = document.getElementById('resultsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '<p>Loading results...</p>';
+    
+    // Calculate results
+    const results = {};
+    
+    // Initialize results for each position
+    appState.positions.forEach(position => {
+        results[position.id] = {
+            title: position.title,
+            candidates: {}
+        };
+        
+        // Initialize each candidate with 0 votes
+        appState.candidates.filter(c => c.positionId === position.id).forEach(candidate => {
+            results[position.id].candidates[candidate.id] = {
+                name: candidate.name,
+                votes: 0
+            };
+        });
+    });
+    
+    // Count votes
+    Object.values(appState.votes).forEach(voterVotes => {
+        Object.entries(voterVotes).forEach(([positionId, candidateId]) => {
+            if (results[positionId] && results[positionId].candidates[candidateId]) {
+                results[positionId].candidates[candidateId].votes++;
             }
         });
     });
+    
+    // Display results
+    let html = '';
+    
+    Object.values(results).forEach(position => {
+        html += `
+            <div class="result-card">
+                <h3>${position.title}</h3>
+                <div class="result-list">
+        `;
+        
+        // Sort candidates by votes (descending)
+        const sortedCandidates = Object.entries(position.candidates)
+            .sort((a, b) => b[1].votes - a[1].votes);
+        
+        const totalVotes = sortedCandidates.reduce((sum, [_, data]) => sum + data.votes, 0);
+        
+        sortedCandidates.forEach(([candidateId, data]) => {
+            const percentage = totalVotes > 0 ? Math.round((data.votes / totalVotes) * 100) : 0;
+            
+            html += `
+                <div class="result-item">
+                    <div class="result-name">${data.name}</div>
+                    <div class="result-bar-container">
+                        <div class="result-bar" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="result-votes">${data.votes} votes (${percentage}%)</div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    if (Object.keys(results).length === 0) {
+        html = '<p class="no-results">No votes have been cast yet.</p>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// Load admin panel
+function loadAdminPanel() {
+    if (!appState.isAdmin) return;
+    
+    loadPositionsList();
+    loadCandidatesSelect();
+    loadCandidatesAdminList();
+    loadVotersList();
+}
+
+// Load positions list for admin
+function loadPositionsList() {
+    const container = document.getElementById('positionsList');
+    if (!container) return;
+    
+    if (appState.positions.length === 0) {
+        container.innerHTML = '<p class="empty-message">No positions added yet.</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.positions.forEach((position, index) => {
+        const candidateCount = appState.candidates.filter(c => c.positionId === position.id).length;
+        
+        html += `
+            <div class="position-item">
+                <div class="position-info">
+                    <strong>${position.title}</strong>
+                    <span class="position-desc">${position.description || ''}</span>
+                    <span class="candidate-count">${candidateCount} candidates</span>
+                </div>
+                <div class="position-actions">
+                    <button class="small-btn delete-position" data-id="${position.id}">Delete</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Add delete handlers
+    document.querySelectorAll('.delete-position').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const positionId = this.dataset.id;
+            appState.positions = appState.positions.filter(p => p.id !== positionId);
+            appState.candidates = appState.candidates.filter(c => c.positionId !== positionId);
+            saveData();
+            loadAdminPanel();
+            updateHomeStats();
+            showToast('Position deleted successfully');
+        });
+    });
+}
+
+// Load candidates select dropdown
+function loadCandidatesSelect() {
+    const select = document.getElementById('candidatePositionSelect');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Select a position</option>';
+    
+    appState.positions.forEach(position => {
+        select.innerHTML += `<option value="${position.id}">${position.title}</option>`;
+    });
+}
+
+// Load candidates admin list
+function loadCandidatesAdminList() {
+    const container = document.getElementById('candidatesAdminList');
+    if (!container) return;
+    
+    if (appState.candidates.length === 0) {
+        container.innerHTML = '<p class="empty-message">No candidates added yet.</p>';
+        return;
+    }
+    
+    // Group by position
+    const candidatesByPosition = {};
+    appState.candidates.forEach(candidate => {
+        if (!candidatesByPosition[candidate.positionId]) {
+            candidatesByPosition[candidate.positionId] = [];
+        }
+        candidatesByPosition[candidate.positionId].push(candidate);
+    });
+    
+    let html = '';
+    
+    appState.positions.forEach(position => {
+        const positionCandidates = candidatesByPosition[position.id] || [];
+        
+        html += `
+            <div class="position-group">
+                <h4>${position.title}</h4>
+        `;
+        
+        positionCandidates.forEach(candidate => {
+            html += `
+                <div class="candidate-item">
+                    <div class="candidate-info">
+                        <strong>${candidate.name}</strong>
+                        <span class="candidate-bio">${candidate.bio || ''}</span>
+                    </div>
+                    <div class="candidate-actions">
+                        <button class="small-btn delete-candidate" data-id="${candidate.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+    });
+    
+    container.innerHTML = html;
+    
+    // Add delete handlers
+    document.querySelectorAll('.delete-candidate').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const candidateId = this.dataset.id;
+            appState.candidates = appState.candidates.filter(c => c.id !== candidateId);
+            saveData();
+            loadAdminPanel();
+            updateHomeStats();
+            showToast('Candidate deleted successfully');
+        });
+    });
+}
+
+// Load voters list
+function loadVotersList() {
+    const container = document.getElementById('votersList');
+    const badge = document.getElementById('totalVotersBadge');
+    
+    if (!container) return;
+    
+    if (badge) {
+        badge.textContent = appState.voters.length;
+    }
+    
+    if (appState.voters.length === 0) {
+        container.innerHTML = '<p class="empty-message">No verified voters yet.</p>';
+        return;
+    }
+    
+    let html = '';
+    appState.voters.forEach(voter => {
+        const hasVoted = appState.votes[voter.id] && Object.keys(appState.votes[voter.id]).length > 0;
+        
+        html += `
+            <div class="voter-record">
+                <div class="voter-info">
+                    <span class="voter-name">${voter.name || 'Anonymous'}</span>
+                    <span class="voter-contact">${voter.mobile} | ${voter.email}</span>
+                </div>
+                <div class="voter-status ${hasVoted ? 'voted' : 'pending'}">
+                    ${hasVoted ? '✓ Voted' : '⏳ Pending'}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Initialize all event listeners
+function initializeEventListeners() {
+    console.log('Initializing event listeners...');
+    
+    // Get all elements
+    const loginModal = document.getElementById('loginModal');
+    const registrationModal = document.getElementById('registrationModal');
+    const appContainer = document.getElementById('appContainer');
+    const showAdminCode = document.getElementById('showAdminCode');
+    const adminCodeSection = document.getElementById('adminCodeSection');
+    const verifyAdminCode = document.getElementById('verifyAdminCode');
+    const enterAsVoter = document.getElementById('enterAsVoter');
+    const adminCode = document.getElementById('adminCode');
+    
+    // Registration elements
+    const verifyVoterBtn = document.getElementById('verifyVoterBtn');
+    const voterMobile = document.getElementById('voterMobile');
+    const voterEmail = document.getElementById('voterEmail');
+    const voterName = document.getElementById('voterName');
+    
+    // Navigation
+    const navHome = document.getElementById('navHome');
+    const navVote = document.getElementById('navVote');
+    const navResults = document.getElementById('navResults');
+    const navAdmin = document.getElementById('navAdmin');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const homeVoteBtn = document.getElementById('homeVoteBtn');
+    
+    // Voting elements
+    const votingForm = document.getElementById('votingForm');
+    const reviewVotesBtn = document.getElementById('reviewVotesBtn');
+    const submitVotesBtn = document.getElementById('submitVotesBtn');
+    const reviewModal = document.getElementById('reviewModal');
+    const closeReviewModal = document.getElementById('closeReviewModal');
+    const confirmVotesBtn = document.getElementById('confirmVotesBtn');
+    const closeSmsModal = document.getElementById('closeSmsModal');
+    
+    // Admin elements
+    const adminTabs = document.querySelectorAll('.admin-tab');
+    const addPositionBtn = document.getElementById('addPositionBtn');
+    const addCandidateBtn = document.getElementById('addCandidateBtn');
+    const updateAdminCodeBtn = document.getElementById('updateAdminCode');
+    const resetAllDataBtn = document.getElementById('resetAllData');
+    const sendBulkSms = document.getElementById('sendBulkSms');
+
+    // Show admin code input when clicking "Login as Admin" button
+    if (showAdminCode) {
+        console.log('Admin button found');
+        showAdminCode.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Admin button clicked');
+            if (adminCodeSection) {
+                adminCodeSection.style.display = 'block';
+            }
+        });
+    } else {
+        console.error('Admin button not found');
+    }
+
+    // Verify admin code
+    if (verifyAdminCode) {
+        verifyAdminCode.addEventListener('click', function() {
+            const code = adminCode ? adminCode.value : '';
+            if (code === appState.adminCode) {
+                appState.isAdmin = true;
+                appState.currentVoter = null;
+                loginModal.style.display = 'none';
+                appContainer.style.display = 'block';
+                if (navAdmin) navAdmin.style.display = 'block';
+                
+                // Hide voter info
+                const voterInfo = document.querySelector('.voter-info');
+                if (voterInfo) voterInfo.style.display = 'none';
+                
+                showToast('Admin login successful!', 'success');
+                loadAdminPanel();
+                showSection('homeSection');
+            } else {
+                showToast('Invalid admin code!', 'error');
+            }
+        });
+    }
+
+    // Enter as voter - show registration modal
+    if (enterAsVoter) {
+        enterAsVoter.addEventListener('click', function() {
+            loginModal.style.display = 'none';
+            if (registrationModal) {
+                registrationModal.style.display = 'flex';
+            }
+        });
+    }
+
+    // Verify voter and proceed to voting
+    if (verifyVoterBtn) {
+        verifyVoterBtn.addEventListener('click', function() {
+            const mobile = voterMobile ? voterMobile.value.trim() : '';
+            const email = voterEmail ? voterEmail.value.trim() : '';
+            const name = voterName ? voterName.value.trim() : 'Anonymous Voter';
+            
+            if (!mobile || !email) {
+                showToast('Please enter both mobile number and email', 'error');
+                return;
+            }
+            
+            if (!mobile.match(/^\+?[\d\s-]{10,}$/)) {
+                showToast('Please enter a valid mobile number', 'error');
+                return;
+            }
+            
+            if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                showToast('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Create voter record
+            const voterId = 'voter_' + Date.now();
+            const voter = {
+                id: voterId,
+                mobile: mobile,
+                email: email,
+                name: name,
+                registeredAt: new Date().toISOString()
+            };
+            
+            appState.voters.push(voter);
+            appState.currentVoter = voter;
+            appState.votes[voterId] = {};
+            saveData();
+            
+            // Hide registration modal and show main app
+            registrationModal.style.display = 'none';
+            appContainer.style.display = 'block';
+            
+            // Hide admin nav
+            if (navAdmin) navAdmin.style.display = 'none';
+            
+            // Show voter info
+            const voterInfo = document.querySelector('.voter-info');
+            const displayMobile = document.getElementById('displayMobile');
+            if (voterInfo) voterInfo.style.display = 'flex';
+            if (displayMobile) displayMobile.textContent = mobile;
+            
+            showToast('Registration successful! You can now vote.', 'success');
+            showSection('voteSection');
+        });
+    }
+
+    // Navigation
+    if (navHome) {
+        navHome.addEventListener('click', () => showSection('homeSection'));
+    }
+    
+    if (navVote) {
+        navVote.addEventListener('click', () => {
+            if (!appState.currentVoter && !appState.isAdmin) {
+                showToast('Please login as voter first', 'error');
+                return;
+            }
+            showSection('voteSection');
+        });
+    }
+    
+    if (navResults) {
+        navResults.addEventListener('click', () => showSection('resultsSection'));
+    }
+    
+    if (navAdmin) {
+        navAdmin.addEventListener('click', () => {
+            if (!appState.isAdmin) {
+                showToast('Admin access only', 'error');
+                return;
+            }
+            showSection('adminSection');
+        });
+    }
+    
+    if (homeVoteBtn) {
+        homeVoteBtn.addEventListener('click', () => {
+            if (!appState.currentVoter && !appState.isAdmin) {
+                // Go back to login
+                appContainer.style.display = 'none';
+                loginModal.style.display = 'flex';
+                return;
+            }
+            showSection('voteSection');
+        });
+    }
+
+    // Logout
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            appState.isAdmin = false;
+            appState.currentVoter = null;
+            appContainer.style.display = 'none';
+            loginModal.style.display = 'flex';
+            
+            // Hide admin code section
+            if (adminCodeSection) adminCodeSection.style.display = 'none';
+            if (adminCode) adminCode.value = '';
+            
+            // Reset registration modal
+            if (registrationModal) registrationModal.style.display = 'none';
+            if (voterMobile) voterMobile.value = '';
+            if (voterEmail) voterEmail.value = '';
+            if (voterName) voterName.value = '';
+            
+            showToast('Logged out successfully', 'success');
+        });
+    }
+
+    // Admin tabs
+    if (adminTabs.length > 0) {
+        adminTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                adminTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+                const tabId = this.dataset.tab + 'Tab';
+                const tabElement = document.getElementById(tabId);
+                if (tabElement) tabElement.classList.add('active');
+            });
+        });
+    }
+
+    // Add position
+    if (addPositionBtn) {
+        addPositionBtn.addEventListener('click', function() {
+            const title = document.getElementById('newPositionTitle');
+            const desc = document.getElementById('newPositionDesc');
+            const order = document.getElementById('newPositionOrder');
+            
+            if (!title || !title.value.trim()) {
+                showToast('Please enter a position title', 'error');
+                return;
+            }
+            
+            const newPosition = {
+                id: 'pos_' + Date.now(),
+                title: title.value.trim(),
+                description: desc ? desc.value.trim() : '',
+                order: order ? parseInt(order.value) || 1 : 1
+            };
+            
+            appState.positions.push(newPosition);
+            saveData();
+            
+            // Clear inputs
+            title.value = '';
+            if (desc) desc.value = '';
+            
+            loadAdminPanel();
+            updateHomeStats();
+            showToast('Position added successfully');
+        });
+    }
+
+    // Add candidate
+    if (addCandidateBtn) {
+        addCandidateBtn.addEventListener('click', function() {
+            const positionSelect = document.getElementById('candidatePositionSelect');
+            const nameInput = document.getElementById('candidateName');
+            const bioInput = document.getElementById('candidateBio');
+            const imageInput = document.getElementById('candidateImage');
+            
+            if (!positionSelect || !positionSelect.value) {
+                showToast('Please select a position', 'error');
+                return;
+            }
+            
+            if (!nameInput || !nameInput.value.trim()) {
+                showToast('Please enter candidate name', 'error');
+                return;
+            }
+            
+            const newCandidate = {
+                id: 'c_' + Date.now(),
+                positionId: positionSelect.value,
+                name: nameInput.value.trim(),
+                bio: bioInput ? bioInput.value.trim() : '',
+                img: imageInput ? imageInput.value.trim() : 'assets/imgs/default'
+            };
+            
+            appState.candidates.push(newCandidate);
+            saveData();
+            
+            // Clear inputs
+            if (nameInput) nameInput.value = '';
+            if (bioInput) bioInput.value = '';
+            if (imageInput) imageInput.value = '';
+            
+            loadAdminPanel();
+            updateHomeStats();
+            showToast('Candidate added successfully');
+        });
+    }
+
+    // Update admin code
+    if (updateAdminCodeBtn) {
+        updateAdminCodeBtn.addEventListener('click', function() {
+            const newCode = document.getElementById('newAdminCode');
+            if (newCode && newCode.value.trim()) {
+                appState.adminCode = newCode.value.trim();
+                saveData();
+                showToast('Admin code updated successfully');
+            }
+        });
+    }
+
+    // Reset all data
+    if (resetAllDataBtn) {
+        resetAllDataBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                appState.positions = defaultData.positions;
+                appState.candidates = defaultData.candidates;
+                appState.votes = {};
+                appState.voters = [];
+                appState.adminCode = 'ADMIN123';
+                appState.currentVoter = null;
+                saveData();
+                loadAdminPanel();
+                updateHomeStats();
+                showToast('All data has been reset');
+            }
+        });
+    }
 
     // Review votes button
-    const reviewBtn = document.getElementById('reviewVotesBtn');
-    if (reviewBtn) {
-        reviewBtn.addEventListener('click', function() {
-            const votes = appState.votes[appState.currentVoter?.id] || {};
+    if (reviewVotesBtn) {
+        reviewVotesBtn.addEventListener('click', function() {
+            if (!appState.currentVoter) {
+                showToast('Please login first', 'error');
+                return;
+            }
+            
+            const voterVotes = appState.votes[appState.currentVoter.id] || {};
             const reviewList = document.getElementById('reviewList');
-            let html = '';
+            
+            if (!reviewList) return;
+            
+            let reviewHtml = '';
             let hasVotes = false;
             
             appState.positions.forEach(position => {
-                const candidateId = votes[position.id];
+                const candidateId = voterVotes[position.id];
                 if (candidateId) {
                     const candidate = appState.candidates.find(c => c.id === candidateId);
                     if (candidate) {
                         hasVotes = true;
-                        html += `
+                        reviewHtml += `
                             <div class="review-item">
                                 <span class="review-position">${position.title}:</span>
                                 <span class="review-candidate">${candidate.name}</span>
@@ -702,293 +828,99 @@ function attachVotingListeners() {
             });
             
             if (!hasVotes) {
-                html = '<p style="text-align:center; color:#64748b; padding:2rem;">No votes selected yet</p>';
+                reviewHtml = '<p class="no-votes">You haven\'t selected any candidates yet.</p>';
             }
             
-            reviewList.innerHTML = html;
-            document.getElementById('reviewModal').style.display = 'flex';
+            reviewList.innerHTML = reviewHtml;
+            
+            if (reviewModal) {
+                reviewModal.style.display = 'flex';
+            }
         });
     }
 
-    // Submit votes button
-    const submitBtn = document.getElementById('submitVotesBtn');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function() {
-            document.getElementById('reviewVotesBtn').click();
+    // Close review modal
+    if (closeReviewModal) {
+        closeReviewModal.addEventListener('click', function() {
+            if (reviewModal) reviewModal.style.display = 'none';
         });
     }
-}
 
-// Attach admin listeners
-function attachAdminListeners() {
-    // Setup image upload
-    setupImageUpload();
-    
-    // Add position
-    const addPositionBtn = document.getElementById('addPositionBtn');
-    if (addPositionBtn) {
-        addPositionBtn.addEventListener('click', function() {
-            const title = document.getElementById('newPositionTitle').value.trim();
-            if (!title) {
-                showToast('Please enter a title', 'error');
-                return;
-            }
+    // Confirm votes
+    if (confirmVotesBtn) {
+        confirmVotesBtn.addEventListener('click', function() {
+            if (!appState.currentVoter) return;
             
-            appState.positions.push({
-                id: 'pos' + Date.now(),
-                title: title,
-                description: document.getElementById('newPositionDesc').value.trim(),
-                order: appState.positions.length + 1
-            });
+            // Close review modal
+            if (reviewModal) reviewModal.style.display = 'none';
+            
+            // Send SMS confirmation
+            const message = `Thank you for voting in the Student Council Election! Your votes have been recorded. - StudentCouncilCampaign.online`;
+            sendSMS(appState.currentVoter.mobile, message);
             
             saveData();
-            
-            // Clear inputs
-            document.getElementById('newPositionTitle').value = '';
-            document.getElementById('newPositionDesc').value = '';
-            
-            // Reload same tab
-            document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-            attachAdminListeners();
-            
-            // Stay on positions tab
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector('[data-tab="positions"]').classList.add('active');
-            document.getElementById('positionsTab').classList.add('active');
-            
-            showToast('Position added');
+            updateHomeStats();
+            showToast('Your votes have been submitted successfully!');
         });
     }
 
-    // Add candidate with image upload
-    const addCandidateBtn = document.getElementById('addCandidateBtn');
-    if (addCandidateBtn) {
-        // Remove existing listeners to avoid duplicates
-        addCandidateBtn.replaceWith(addCandidateBtn.cloneNode(true));
-        const newAddCandidateBtn = document.getElementById('addCandidateBtn');
-        
-        newAddCandidateBtn.addEventListener('click', function() {
-            const positionId = document.getElementById('candidatePositionSelect').value;
-            const name = document.getElementById('candidateName').value.trim();
-            const bio = document.getElementById('candidateBio').value.trim();
-            const imageData = document.getElementById('candidateImage').value;
-            
-            if (!positionId) {
-                showToast('Select a position', 'error');
-                return;
-            }
-            if (!name) {
-                showToast('Enter candidate name', 'error');
-                return;
-            }
-            
-            // Use default image if none uploaded
-            const candidateImage = imageData || 'https://via.placeholder.com/100';
-            
-            appState.candidates.push({
-                id: 'c' + Date.now(),
-                positionId: positionId,
-                name: name,
-                bio: bio,
-                img: candidateImage
-            });
-            
-            saveData();
-            
-            // Clear all inputs
-            document.getElementById('candidateName').value = '';
-            document.getElementById('candidateBio').value = '';
-            document.getElementById('candidateImage').value = '';
-            document.getElementById('selectedFileName').textContent = 'No file selected';
-            document.getElementById('previewImg').src = 'https://via.placeholder.com/100';
-            
-            // Reset file input
-            const fileInput = document.getElementById('candidateImageUpload');
-            if (fileInput) {
-                fileInput.value = '';
-            }
-            
-            // Reload same tab
-            document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-            attachAdminListeners();
-            
-            // Stay on candidates tab
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector('[data-tab="candidates"]').classList.add('active');
-            document.getElementById('candidatesTab').classList.add('active');
-            
-            showToast('Candidate added with image');
+    // Close SMS modal
+    if (closeSmsModal) {
+        closeSmsModal.addEventListener('click', function() {
+            const smsModal = document.getElementById('smsModal');
+            if (smsModal) smsModal.style.display = 'none';
         });
     }
 
-    // Admin tabs
-    document.querySelectorAll('.admin-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-            
-            this.classList.add('active');
-            document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-        });
-    });
-}
-
-// Initialize
-function init() {
-    loadData();
-    
-    // Role selection
-    document.getElementById('showAdminLogin').addEventListener('click', function(e) {
-        e.stopPropagation();
-        document.getElementById('adminCodeSection').style.display = 'block';
-        this.style.display = 'none';
-    });
-
-    document.getElementById('verifyAdminBtn').addEventListener('click', function() {
-        const code = document.getElementById('adminCode').value;
-        if (code === appState.adminCode) {
-            appState.isAdmin = true;
-            document.getElementById('roleModal').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('voterInfo').style.display = 'none';
-            updateNavigation();
-            document.getElementById('mainContent').innerHTML = loadAdminDashboard();
-            attachAdminListeners();
-            showToast('Admin login successful!');
-        } else {
-            showToast('Invalid admin code!', 'error');
-        }
-    });
-
-    document.getElementById('continueAsVoter').addEventListener('click', function() {
-        document.getElementById('roleModal').style.display = 'none';
-        document.getElementById('registrationModal').style.display = 'flex';
-    });
-
-    // Voter registration
-    document.getElementById('verifyVoterBtn').addEventListener('click', function() {
-        const email = document.getElementById('voterEmail').value.trim();
-        const name = document.getElementById('voterName').value.trim() || 'Voter';
-        
-        if (!email) {
-            showToast('Please enter your email', 'error');
-            return;
-        }
-        
-        // Simple email validation
-        if (!email.includes('@') || !email.includes('.')) {
-            showToast('Please enter a valid email', 'error');
-            return;
-        }
-        
-        const voterId = 'voter_' + Date.now();
-        const voter = { id: voterId, email, name };
-        
-        appState.voters.push(voter);
-        appState.currentVoter = voter;
-        appState.votes[voterId] = {};
-        saveData();
-        
-        document.getElementById('registrationModal').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'block';
-        document.getElementById('voterInfo').style.display = 'flex';
-        document.getElementById('displayEmail').textContent = email;
-        
-        updateNavigation();
-        document.getElementById('mainContent').innerHTML = loadHomeSection();
-        attachHomeButtonListener();
-        showToast('Registration successful!');
-    });
-
-    // Confirm votes with Email
-    document.getElementById('confirmVotesBtn').addEventListener('click', function() {
-        const votes = appState.votes[appState.currentVoter?.id] || {};
-        
-        // Check if all positions have votes
-        let allVoted = true;
-        appState.positions.forEach(position => {
-            if (!votes[position.id]) {
-                allVoted = false;
-            }
-        });
-        
-        if (!allVoted) {
-            showToast('Please vote for all positions', 'error');
-            document.getElementById('reviewModal').style.display = 'none';
-            return;
-        }
-        
-        const voteSummary = [];
-        appState.positions.forEach(position => {
-            const candidateId = votes[position.id];
-            const candidate = appState.candidates.find(c => c.id === candidateId);
-            if (candidate) {
-                voteSummary.push({
-                    position: position.title,
-                    candidate: candidate.name
-                });
-            }
-        });
-        
-        sendEmailConfirmation(
-            appState.currentVoter.email,
-            appState.currentVoter.name,
-            voteSummary
-        );
-        
-        document.getElementById('reviewModal').style.display = 'none';
-        saveData();
-        showToast('✅ Vote recorded! Check your email', 'success');
-    });
-
-    // Logout
-    document.addEventListener('click', function(e) {
-        if (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn')) {
+    // Voting form submit
+    if (votingForm) {
+        votingForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Reset state
-            appState.isAdmin = false;
-            appState.currentVoter = null;
+            if (!appState.currentVoter) {
+                showToast('Please login first', 'error');
+                return;
+            }
             
-            // Hide app, show role modal
-            document.getElementById('appContainer').style.display = 'none';
-            document.getElementById('roleModal').style.display = 'flex';
-            
-            // Hide all other modals
-            document.getElementById('registrationModal').style.display = 'none';
-            document.getElementById('reviewModal').style.display = 'none';
-            document.getElementById('emailModal').style.display = 'none';
-            
-            // Reset admin login section
-            document.getElementById('adminCodeSection').style.display = 'none';
-            document.getElementById('showAdminLogin').style.display = 'block';
-            document.getElementById('adminCode').value = '';
-            
-            // Show success message
-            showToast('Logged out successfully', 'success');
-        }
-    });
+            // Trigger review
+            if (reviewVotesBtn) {
+                reviewVotesBtn.click();
+            }
+        });
+    }
 
-    // Close modals
-    document.getElementById('closeReviewModal').addEventListener('click', function() {
-        document.getElementById('reviewModal').style.display = 'none';
-    });
-
-    document.getElementById('closeEmailModal').addEventListener('click', function() {
-        document.getElementById('emailModal').style.display = 'none';
-    });
-
-    window.addEventListener('click', function(e) {
-        if (e.target.classList.contains('review-modal')) {
-            document.getElementById('reviewModal').style.display = 'none';
-        }
-        if (e.target.classList.contains('email-modal')) {
-            document.getElementById('emailModal').style.display = 'none';
-        }
-    });
+    // Bulk SMS
+    if (sendBulkSms) {
+        sendBulkSms.addEventListener('click', function() {
+            const messageInput = document.getElementById('bulkSmsMessage');
+            const message = messageInput ? messageInput.value.trim() : '';
+            
+            if (!message) {
+                showToast('Please enter a message', 'error');
+                return;
+            }
+            
+            if (appState.voters.length === 0) {
+                showToast('No voters to send SMS to', 'error');
+                return;
+            }
+            
+            // Simulate sending bulk SMS
+            appState.voters.forEach(voter => {
+                console.log(`SMS sent to ${voter.mobile}: ${message}`);
+            });
+            
+            showToast(`SMS sent to ${appState.voters.length} voters`, 'success');
+            if (messageInput) messageInput.value = '';
+        });
+    }
 }
 
-// Start
-init();
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing...');
+    loadData();
+    initializeEventListeners();
+    updateHomeStats();
+});
+
