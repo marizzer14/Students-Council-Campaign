@@ -1420,5 +1420,50 @@ body {
     .stats-preview {
         grid-template-columns: 1fr !important;
     }
+
+    /* Back Button Styles */
+#adminBackBtn, #voterBackBtn {
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
+
+#adminBackBtn:hover, #voterBackBtn:hover {
+    background: #e2e8f0 !important;
+    transform: translateX(-3px);
+}
+
+/* Mobile styles for back buttons */
+@media only screen and (max-width: 768px) {
+    #adminBackBtn, #voterBackBtn {
+        padding: 12px !important;
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* Back Button Styles */
+#voterBackBtn, #adminBackBtn {
+    transition: all 0.3s ease;
+    border: 2px solid transparent !important;
+}
+
+#voterBackBtn:hover, #adminBackBtn:hover {
+    transform: translateX(-5px);
+    border-color: #2563eb !important;
+}
+
+#voterBackBtn:active, #adminBackBtn:active {
+    transform: scale(0.98);
+}
+
+/* Make sure back button is visible on mobile */
+@media (max-width: 768px) {
+    #voterBackBtn, #adminBackBtn {
+        font-size: 16px !important;
+        padding: 14px 20px !important;
+        margin-bottom: 20px !important;
+    }
 }
